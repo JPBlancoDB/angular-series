@@ -1,1 +1,11 @@
-<p>login works!</p>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <input id="email" type="email" placeholder="Your email" />
+  <span *ngIf="submitted && form.controls.email.invalid" id="email-error">
+    Please enter a valid email.
+  </span>
+  <input id="password" type="password" placeholder="********" />
+  <span *ngIf="submitted && form.controls.password.invalid" id="password-error">
+    Please enter a valid password.
+  </span>
+  <button type="submit">Sign in</button>
+</form>
