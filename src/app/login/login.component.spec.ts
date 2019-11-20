@@ -1,16 +1,28 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { of } from 'rxjs';
 
 import { LoginComponent } from './login.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { AuthService } from './auth.service';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
+  const authServiceStub: jasmine.SpyObj<AuthService> = jasmine.createSpyObj(
+    'authService',
+    ['login']
+  );
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [LoginComponent],
-      imports: [ReactiveFormsModule]
+      imports: [ReactiveFormsModule],
+      providers: [
+        {
+          provide: AuthService,
+          useValue: authServiceStub
+        }
+      ]
     }).compileComponents();
   }));
 
@@ -94,6 +106,22 @@ describe('LoginComponent', () => {
     expect(elements.querySelector('#password-error')).toBeTruthy();
     expect(elements.querySelector('#password-error').textContent).toContain(
       'Please enter a valid password.'
+    );
+  });
+
+  it('should invoke auth service when form is valid', () => {
+    const email = component.form.controls.email;
+    email.setValue('test@test.com');
+    const password = component.form.controls.password;
+    password.setValue('123456');
+    authServiceStub.login.and.returnValue(of());
+
+    fixture.nativeElement.querySelector('button').click();
+
+    expect(authServiceStub.login.calls.any()).toBeTruthy();
+    expect(authServiceStub.login).toHaveBeenCalledWith(
+      email.value,
+      password.value
     );
   });
 });
